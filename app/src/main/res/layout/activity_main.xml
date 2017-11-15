@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -14,57 +15,66 @@
         android:elevation="4dp"
         app:titleTextColor="@color/colorAccent" />
 
-
-    <Button
-        android:id="@+id/btn1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="secound"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.676"
-        tools:ignore="MissingConstraints" />
-
     <LinearLayout
-        android:layout_width="368dp"
-        android:layout_height="175dp"
+        android:layout_width="344dp"
+        android:layout_height="495dp"
+        android:layout_marginTop="80dp"
+        android:paddingTop="80dp"
         android:orientation="vertical"
         tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="64dp">
+        tools:layout_editor_absoluteY="64dp"
+        tools:ignore="MissingConstraints">
 
         <TextView
+            android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:shadowColor="@android:color/black"
             android:text="Search Property"
-            android:textColor="@android:color/black"
-            android:textSize="24sp" />
+            android:textSize="30dp"
+            android:textAlignment="center"/>
 
         <EditText
             android:id="@+id/StreetText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Street"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:hint="street" />
 
         <EditText
             android:id="@+id/CityText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="City"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:hint="city" />
+
+        <Spinner
+            android:id="@+id/stateSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Search"
+                android:id="@+id/btn1"/>
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Clear"
+                android:id="@+id/btn2"/>
+
+        </LinearLayout>
+
 
     </LinearLayout>
-
-    <Spinner
-        android:id="@+id/stateSpinner"
-        android:layout_width="368dp"
-        android:layout_height="31dp"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="195dp" />
 
 </android.support.constraint.ConstraintLayout>
