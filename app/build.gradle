@@ -37,4 +37,6 @@ dependencies {
 
     compile 'com.google.api-client:google-api-client-gson:+'
 
+  //  compile 'com.github.chrisbanes:PhotoView:latest.release.here'
+
 }
