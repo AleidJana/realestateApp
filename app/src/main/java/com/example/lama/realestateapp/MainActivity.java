@@ -142,9 +142,6 @@ EditText e2;
                         case XmlPullParser.END_TAG:
 
                            if (tagname.equalsIgnoreCase("code")) {
-                               if(Integer.parseInt(text)!=0) {
-                                   return res = null;
-                               }
 
                             }  else if (tagname.equalsIgnoreCase("street")) {
                                res[0]=text;
@@ -174,6 +171,13 @@ EditText e2;
     }
 
     class HttpRequst extends AsyncTask<String,Void,String>{
+        ProgressDialog loading;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loading = ProgressDialog.show(getApplicationContext(), "Please Wait",null, true, true);
+        }
         @Override
         protected String doInBackground(String... urls) {
 
@@ -201,9 +205,8 @@ EditText e2;
 
 
             Bundle b=new Bundle();
-            String[] result =ParseXML(s);
-            if (result!=null) {
-                b.putStringArray("info", result);
+            if (s!=null) {
+                b.putStringArray("info", ParseXML(s));
                 Intent i = new Intent(MainActivity.this, SecoundActivity.class);
                 i.putExtras(b);
                 startActivity(i);

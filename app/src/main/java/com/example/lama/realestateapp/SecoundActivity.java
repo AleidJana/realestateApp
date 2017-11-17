@@ -61,6 +61,7 @@ public class SecoundActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
+
                     return new tab1();
                 case 1:
                     return new tab2();
