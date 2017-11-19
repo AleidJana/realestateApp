@@ -1,10 +1,13 @@
 package com.example.lama.realestateapp;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.provider.SyncStateContract;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +24,15 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.apache.http.HttpRequest;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 import java.io.BufferedReader;
@@ -28,6 +40,9 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class MainActivity extends AppCompatActivity implements OnItemSelectedListener{
 Button b;
@@ -35,6 +50,14 @@ Button b2;
 Spinner stateSpinner;
 EditText e1;
 EditText e2;
+TableLayout tableLayout;
+TableRow tableRow;
+SharedPreferences sharedpreferences;
+    TextView streettable;
+    TextView citytable;
+    TextView statetable;
+
+public static final String MyPREFERENCES = "MyPrefs" ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,7 +118,7 @@ EditText e2;
                     String address = e1.getText().toString();
                     String citytext = e2.getText().toString();
                     String state = stateSpinner.getSelectedItem().toString();
-                    new HttpRequst().execute(address,citytext,state);
+                       new HttpRequst().execute(address,citytext,state);
 
 
                 }
@@ -104,9 +127,105 @@ EditText e2;
 
             }
         });
+        //////////////////////
+        //swipe to delete table
 
+       /* tableRow=(TableRow)findViewById(R.id.tableRow2);
+
+        tableRow.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                tableRow.setOnTouchListener(new SwipeDismissTouchListener(
+                        tableRow,
+                        null,
+                        new SwipeDismissTouchListener.DismissCallbacks() {
+                            @Override
+                            public boolean canDismiss(Object token) {
+                                return true;
+                            }
+
+                            @Override
+                            public void onDismiss(View view, Object token) {
+                                new AlertDialog.Builder(MainActivity.this)
+                                        .setTitle("Delete")
+                                        .setMessage("Do you really want to delete this property")
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                Toast.makeText(MainActivity.this, "Yaay", Toast.LENGTH_SHORT).show();
+                                                tableLayout.removeView(tableRow);
+                                            }
+                                        })
+                                        .setNegativeButton(android.R.string.no, null).show();
+
+
+                            }
+                        }));
+            }
+        });*/
+        //////////////////////
+        //retrieve data from shared preferences
+
+
+
+
+        //SHARE PREFERENCES
+
+       sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+       Map<String,?> keys = sharedpreferences.getAll();
+        JSONArray arr = new JSONArray();
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+            JSONObject obj = new JSONObject();
+            try {
+                obj.put(entry.getKey(), entry.getValue().toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            arr.put(obj);
+        }
+
+            tableLayout=(TableLayout)findViewById(R.id.tableLayout);
+
+
+
+        String street = null;
+        String city = null;
+        String state = null;
+        TextView street2;
+        TextView city2;
+        TextView state2;
+int j=0;
+            for (int i = 0; i <arr.length();i+=3) {
+
+                TableRow row= new TableRow(this);
+                TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
+                row.setLayoutParams(lp);
+                street2 = new TextView(this);
+                city2 = new TextView(this);
+                state2 = new TextView(this);
+
+                try {
+                    state=arr.getJSONObject(i).getString("state"+j);
+                    city=arr.getJSONObject(i+1).getString("city"+j);
+                    street=arr.getJSONObject(i+2).getString("street"+j);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                street2.setText(street);
+                city2.setText(city);
+                 state2.setText(state);
+                row.addView(street2);
+                row.addView(city2);
+                row.addView(state2);
+                j++;
+
+                tableLayout.addView(row);
+           }
 
     }
+
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -210,6 +329,7 @@ EditText e2;
                 Intent i = new Intent(MainActivity.this, SecoundActivity.class);
                 i.putExtras(b);
                 startActivity(i);
+
             }
             else {
                 AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();

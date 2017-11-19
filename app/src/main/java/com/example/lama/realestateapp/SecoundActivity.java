@@ -20,7 +20,7 @@ import tabs.tab2;
 
 public class SecoundActivity extends AppCompatActivity {
     SharedPreferences sharedpreferences;
-    String[] array;
+     static String[] array;
     public static final String MyPREFERENCES = "MyPrefs" ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +61,11 @@ public class SecoundActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-
-                    return new tab1();
+                Bundle b = new Bundle();
+                b.putString("zipcode",array[1]);
+                tab1 f = new tab1();
+                f.setArguments(b);
+                return f;
                 case 1:
                     return new tab2();
                 default:
@@ -97,12 +100,14 @@ public class SecoundActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        int i=0;
         int id = item.getItemId();
         if (id == R.id.item_one) {
            SharedPreferences.Editor editor = sharedpreferences.edit();
-            editor.putString("city", array[2]);
-            editor.putString("state", array[3]);
-            editor.putString("street", array[0]);
+            editor.putString("city"+i, array[2]);
+            editor.putString("state"+i, array[3]);
+            editor.putString("street"+i, array[0]);
+            i++;
             editor.commit();
             item.setIcon(android.R.drawable.btn_star_big_on);
             //by below line you can get a value from sharedpreferences.
