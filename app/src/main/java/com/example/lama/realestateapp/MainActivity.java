@@ -17,6 +17,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -28,6 +29,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import org.apache.http.HttpRequest;
 import org.json.JSONArray;
@@ -56,6 +59,7 @@ SharedPreferences sharedpreferences;
     TextView streettable;
     TextView citytable;
     TextView statetable;
+    static  int j=0;
 
 public static final String MyPREFERENCES = "MyPrefs" ;
     @Override
@@ -64,12 +68,12 @@ public static final String MyPREFERENCES = "MyPrefs" ;
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ActionBar menu=getSupportActionBar();
+        ActionBar menu = getSupportActionBar();
         menu.setDisplayShowHomeEnabled(true);
         menu.setLogo(R.drawable.ic_action_name);
         menu.setDisplayUseLogoEnabled(true);
         /////////////////////
-        e1=(EditText)findViewById(R.id.StreetText);
+        e1 = (EditText) findViewById(R.id.StreetText);
         String simple = "Enter Street ";
         String colored = "*";
         SpannableStringBuilder builder = new SpannableStringBuilder();
@@ -80,7 +84,7 @@ public static final String MyPREFERENCES = "MyPrefs" ;
         builder.setSpan(new ForegroundColorSpan(Color.RED), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         e1.setHint(builder);
         /////////////////////
-        e2=(EditText)findViewById(R.id.CityText);
+        e2 = (EditText) findViewById(R.id.CityText);
         String simple2 = "Enter City ";
         String colored2 = "*";
         SpannableStringBuilder builder2 = new SpannableStringBuilder();
@@ -92,11 +96,11 @@ public static final String MyPREFERENCES = "MyPrefs" ;
         e2.setHint(builder2);
         //////////////////////
         //spinner
-        stateSpinner = (Spinner)findViewById(R.id.stateSpinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.states, android.R.layout.simple_spinner_item);
+        stateSpinner = (Spinner) findViewById(R.id.stateSpinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.states, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         stateSpinner.setAdapter(adapter);
-        b2= (Button)findViewById(R.id.btn2);
+        b2 = (Button) findViewById(R.id.btn2);
         b2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -104,78 +108,35 @@ public static final String MyPREFERENCES = "MyPrefs" ;
                 e2.setText("");
             }
         });
-        b= (Button)findViewById(R.id.btn1);
+        b = (Button) findViewById(R.id.btn1);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if(e1.getText().length()==0) {
+                if (e1.getText().length() == 0) {
                     e1.setError("Street field is required!");
-                }else if(e2.getText().length()==0)
-                {
+                } else if (e2.getText().length() == 0) {
                     e2.setError("City field is required!");
-                }else {
+                } else {
                     String address = e1.getText().toString();
                     String citytext = e2.getText().toString();
                     String state = stateSpinner.getSelectedItem().toString();
-                       new HttpRequst().execute(address,citytext,state);
+                    new HttpRequst().execute(address, citytext, state);
 
 
                 }
 
 
-
             }
         });
-        //////////////////////
-        //swipe to delete table
-
-       /* tableRow=(TableRow)findViewById(R.id.tableRow2);
-
-        tableRow.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                tableRow.setOnTouchListener(new SwipeDismissTouchListener(
-                        tableRow,
-                        null,
-                        new SwipeDismissTouchListener.DismissCallbacks() {
-                            @Override
-                            public boolean canDismiss(Object token) {
-                                return true;
-                            }
-
-                            @Override
-                            public void onDismiss(View view, Object token) {
-                                new AlertDialog.Builder(MainActivity.this)
-                                        .setTitle("Delete")
-                                        .setMessage("Do you really want to delete this property")
-                                        .setIcon(android.R.drawable.ic_dialog_alert)
-                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-                                            public void onClick(DialogInterface dialog, int whichButton) {
-                                                Toast.makeText(MainActivity.this, "Yaay", Toast.LENGTH_SHORT).show();
-                                                tableLayout.removeView(tableRow);
-                                            }
-                                        })
-                                        .setNegativeButton(android.R.string.no, null).show();
-
-
-                            }
-                        }));
-            }
-        });*/
         //////////////////////
         //retrieve data from shared preferences
 
 
-
-
-        //SHARE PREFERENCES
-
-       sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-       Map<String,?> keys = sharedpreferences.getAll();
+        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        Map<String, ?> keys = sharedpreferences.getAll();
         JSONArray arr = new JSONArray();
-        for(Map.Entry<String,?> entry : keys.entrySet()){
+        for (Map.Entry<String, ?> entry : keys.entrySet()) {
             JSONObject obj = new JSONObject();
             try {
                 obj.put(entry.getKey(), entry.getValue().toString());
@@ -185,46 +146,93 @@ public static final String MyPREFERENCES = "MyPrefs" ;
             arr.put(obj);
         }
 
-            tableLayout=(TableLayout)findViewById(R.id.tableLayout);
 
-
-
+        tableLayout = (TableLayout) findViewById(R.id.tableLayout);
         String street = null;
         String city = null;
         String state = null;
         TextView street2;
         TextView city2;
         TextView state2;
-int j=0;
-            for (int i = 0; i <arr.length();i+=3) {
 
-                TableRow row= new TableRow(this);
+        if (arr.length() != 0) {
+            for(int i=0;i<arr.length();i++){
+                final TableRow row = new TableRow(this);
                 TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
+
                 row.setLayoutParams(lp);
                 street2 = new TextView(this);
                 city2 = new TextView(this);
                 state2 = new TextView(this);
 
-                try {
-                    state=arr.getJSONObject(i).getString("state"+j);
-                    city=arr.getJSONObject(i+1).getString("city"+j);
-                    street=arr.getJSONObject(i+2).getString("street"+j);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                street=sharedpreferences.getString("street"+i,"");
+                city=sharedpreferences.getString("city"+i,"");
+                state=sharedpreferences.getString("state"+i,"");
 
+if (!street.equals("")&& !city.equals("") && !city.equals("")){
                 street2.setText(street);
+                street2.setGravity(Gravity.CENTER);
                 city2.setText(city);
-                 state2.setText(state);
+                city2.setGravity(Gravity.CENTER);
+                city2.setPadding(20,0,0,0);
+                state2.setText(state);
+                state2.setGravity(Gravity.CENTER);
                 row.addView(street2);
                 row.addView(city2);
                 row.addView(state2);
-                j++;
 
-                tableLayout.addView(row);
-           }
+                tableLayout.addView(row);}
 
+
+                final int finalI = i;
+                final String finalState = state;
+                final String finalCity = city;
+                final String finalStreet = street;
+
+                row.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+
+                        if (!finalState.equals("")&& !finalCity.equals("") && !finalStreet.equals("")){
+                           String street3= finalStreet.substring(0,finalStreet.indexOf(' '));
+                        new HttpRequst().execute(street3, finalCity, finalState);}
+                        row.setOnTouchListener(new SwipeDismissTouchListener(
+                                row,
+                                null,
+                                new SwipeDismissTouchListener.DismissCallbacks() {
+                                    @Override
+                                    public boolean canDismiss(Object token) {
+                                        return true;
+                                    }
+
+                                    @Override
+                                    public void onDismiss(View view, Object token) {
+                                        new AlertDialog.Builder(MainActivity.this)
+                                                .setTitle("Delete")
+                                                .setMessage("Do you really want to delete this property")
+                                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                                        Toast.makeText(MainActivity.this, "property deleted successfully", Toast.LENGTH_SHORT).show();
+                                                        sharedpreferences.edit().remove("state"+ finalI).commit();
+                                                        sharedpreferences.edit().remove("street"+ finalI).commit();
+                                                        sharedpreferences.edit().remove("city"+ finalI).commit();
+                                                        tableLayout.removeView(row);
+                                                    }
+                                                })
+                                                .setNegativeButton(android.R.string.no, null).show();
+
+
+                                    }
+                                }));
+                    }
+                });
+
+
+            }//for
+    }//if
     }
+
 
 
     @Override
@@ -326,7 +334,6 @@ int j=0;
                 Intent i = new Intent(MainActivity.this, SecoundActivity.class);
                 i.putExtras(b);
                 startActivity(i);
-
             }
             else {
                 AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
