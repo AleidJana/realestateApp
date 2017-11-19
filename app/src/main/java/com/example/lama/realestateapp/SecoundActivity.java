@@ -1,5 +1,6 @@
 package com.example.lama.realestateapp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -71,9 +73,17 @@ public class SecoundActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                   return new tab1();
+                    Bundle b = new Bundle();
+                    b.putStringArray("info",array);
+                    tab1 t= new tab1();
+                    t.setArguments(b);
+                   return t;
                 case 1:
-                    return new tab2();
+                    Bundle b1 = new Bundle();
+                    b1.putString("zipid",array[1]);
+                    tab2 t2= new tab2();
+                    t2.setArguments(b1);
+                    return t2;
                 default:
                     return null;
             }
@@ -89,17 +99,23 @@ public class SecoundActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "chart";
-                case 1:
                     return "details";
+                case 1:
+                    return "chart";
                 default:
                     return null;
             }
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.star, menu);
+if(array[7].equals("true"))
+{
+    menu.getItem(0).setIcon(ContextCompat.getDrawable(this, android.R.drawable.btn_star_big_on));
+
+}
         return true;
     }
 

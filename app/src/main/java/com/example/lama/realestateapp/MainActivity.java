@@ -46,6 +46,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.widget.Toast.LENGTH_LONG;
+
 
 public class MainActivity extends AppCompatActivity implements OnItemSelectedListener{
 Button b;
@@ -59,6 +61,9 @@ SharedPreferences sharedpreferences;
     TextView streettable;
     TextView citytable;
     TextView statetable;
+    String street = null;
+    String city = null;
+    String state = null;
     static  int j=0;
 
 public static final String MyPREFERENCES = "MyPrefs" ;
@@ -70,7 +75,7 @@ public static final String MyPREFERENCES = "MyPrefs" ;
         setSupportActionBar(toolbar);
         ActionBar menu = getSupportActionBar();
         menu.setDisplayShowHomeEnabled(true);
-        menu.setLogo(R.drawable.ic_action_name);
+        menu.setLogo(R.mipmap.ic_launcher);
         menu.setDisplayUseLogoEnabled(true);
         /////////////////////
         e1 = (EditText) findViewById(R.id.StreetText);
@@ -121,7 +126,7 @@ public static final String MyPREFERENCES = "MyPrefs" ;
                     String address = e1.getText().toString();
                     String citytext = e2.getText().toString();
                     String state = stateSpinner.getSelectedItem().toString();
-                    new HttpRequst().execute(address, citytext, state);
+                    new HttpRequst().execute(address, citytext, state,"false");
 
 
                 }
@@ -148,9 +153,7 @@ public static final String MyPREFERENCES = "MyPrefs" ;
 
 
         tableLayout = (TableLayout) findViewById(R.id.tableLayout);
-        String street = null;
-        String city = null;
-        String state = null;
+
         TextView street2;
         TextView city2;
         TextView state2;
@@ -194,7 +197,7 @@ if (!street.equals("")&& !city.equals("") && !city.equals("")){
 
                         if (!finalState.equals("")&& !finalCity.equals("") && !finalStreet.equals("")){
                            String street3= finalStreet.substring(0,finalStreet.indexOf(' '));
-                        new HttpRequst().execute(street3, finalCity, finalState);}
+                        new HttpRequst().execute(street3, finalCity, finalState,"true");}
                         row.setOnTouchListener(new SwipeDismissTouchListener(
                                 row,
                                 null,
@@ -245,7 +248,7 @@ if (!street.equals("")&& !city.equals("") && !city.equals("")){
 
     public String[] ParseXML(String xmlString) {
         String text=null;
-        String []res=new String[6];
+        String []res=new String[8];
         try {
                 XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
                 factory.setNamespaceAware(true);
@@ -269,10 +272,13 @@ if (!street.equals("")&& !city.equals("") && !city.equals("")){
                         case XmlPullParser.END_TAG:
 
                            if (tagname.equalsIgnoreCase("code")) {
+                               if(Integer.parseInt(text)!=0) {
+                                   return null;
+                               }
 
                             }  else if (tagname.equalsIgnoreCase("street")) {
                                res[0]=text;
-                           } else if (tagname.equalsIgnoreCase("zipcode")) {
+                           } else if (tagname.equalsIgnoreCase("zpid")) {
                                res[1]=text;
                             } else if (tagname.equalsIgnoreCase("city")) {
                                res[2]=text;
@@ -282,6 +288,9 @@ if (!street.equals("")&& !city.equals("") && !city.equals("")){
                                res[4]=text;
                             } else if (tagname.equalsIgnoreCase("longitude")) {
                                res[5]=text;
+                           }
+                           else if (tagname.equalsIgnoreCase("amount")) {
+                               res[6]=text;
                            }
                             break;
                         default:
@@ -298,17 +307,21 @@ if (!street.equals("")&& !city.equals("") && !city.equals("")){
     }
 
     class HttpRequst extends AsyncTask<String,Void,String>{
-        ProgressDialog loading;
-
+        ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+String bool;
         @Override
+
         protected void onPreExecute() {
+
             super.onPreExecute();
-            loading = ProgressDialog.show(getApplicationContext(), "Please Wait",null, true, true);
+            dialog.setMessage("please wait");
+            dialog.show();
         }
         @Override
         protected String doInBackground(String... urls) {
 
             try {
+                bool=urls[3];
                 URL url = new URL("http://www.zillow.com/webservice/GetSearchResults.htm?zws-id=X1-ZWz18wlnzn0miz_7oq0o&address="+urls[0]+"+Bigelow+Ave&citystatezip="+urls[1]+"%2C+"+urls[2]);
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -329,11 +342,17 @@ if (!street.equals("")&& !city.equals("") && !city.equals("")){
 
         @Override
         protected void onPostExecute(String s) {
-
-
+            dialog.hide();
+            String [] arr= ParseXML(s);
+            if(street.equals(arr[0])&&city.equals(arr[2])&&state.equals(arr[3]))
+            {
+              Toast.makeText(MainActivity.this,bool,LENGTH_LONG).show();
+                bool="true";
+            }
             Bundle b=new Bundle();
-            if (s!=null) {
-                b.putStringArray("info", ParseXML(s));
+            arr[7]=bool;
+            if (arr!=null) {
+                b.putStringArray("info", arr);
                 Intent i = new Intent(MainActivity.this, SecoundActivity.class);
                 i.putExtras(b);
                 startActivity(i);
