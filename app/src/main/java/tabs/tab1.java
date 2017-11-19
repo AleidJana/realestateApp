@@ -31,7 +31,7 @@ public class tab1 extends Fragment {
         chartView = (ImageView) view.findViewById(R.id.imageView);
 
 
-        String zipcode = getArguments().getString("zipcode");
+/*        String zipcode = getArguments().getString("zipcode");
 
         try {
              url = new URL("http://www.zillow.com/webservice/GetChart.htm?zws-id=X1-ZWz18wlnzn0miz_7oq0o&unit-type=percent&zpid=48749425&width=300&height=150&zpid=" + zipcode);
@@ -41,7 +41,7 @@ public class tab1 extends Fragment {
         DownloadImageTask dow = new DownloadImageTask(chartView);
         dow.execute(url+"");
 
-
+*/
         return view;
 
     }

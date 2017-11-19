@@ -15,12 +15,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import tabs.tab1;
 import tabs.tab2;
+
+import static java.security.AccessController.getContext;
 
 public class SecoundActivity extends AppCompatActivity {
     SharedPreferences sharedpreferences;
      static String[] array;
+
     public static final String MyPREFERENCES = "MyPrefs" ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +45,6 @@ public class SecoundActivity extends AppCompatActivity {
         // Assign created adapter to viewPager
         viewPager.setAdapter(new TabsExamplePagerAdapter(getSupportFragmentManager()));
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         // This method setup all required method for TabLayout with Viewpager
         tabLayout.setupWithViewPager(viewPager);
@@ -46,6 +55,7 @@ public class SecoundActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+
     }
 
     public static class TabsExamplePagerAdapter extends FragmentPagerAdapter {
@@ -61,11 +71,7 @@ public class SecoundActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                Bundle b = new Bundle();
-                b.putString("zipcode",array[1]);
-                tab1 f = new tab1();
-                f.setArguments(b);
-                return f;
+                   return new tab1();
                 case 1:
                     return new tab2();
                 default:
@@ -97,25 +103,33 @@ public class SecoundActivity extends AppCompatActivity {
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        int i=0;
         int id = item.getItemId();
         if (id == R.id.item_one) {
-           SharedPreferences.Editor editor = sharedpreferences.edit();
-            editor.putString("city"+i, array[2]);
-            editor.putString("state"+i, array[3]);
-            editor.putString("street"+i, array[0]);
-            i++;
-            editor.commit();
-            item.setIcon(android.R.drawable.btn_star_big_on);
-            //by below line you can get a value from sharedpreferences.
-            // String value = sharedpreferences.getString("city","");
 
+          for (int i=0;i<50;i++) {
+              if (sharedpreferences.contains("city"+i)&&sharedpreferences.contains("state"+i)&&sharedpreferences.contains("street"+i)){
+              if (sharedpreferences.getString("city" + i, null).equals(array[2]) && sharedpreferences.getString("state" + i, null).equals(array[3])
+                      && sharedpreferences.getString("street" + i, null).equals(array[0])) {
+                  break;
+              }} else {
+                  SharedPreferences.Editor editor = sharedpreferences.edit();
+                  if (!sharedpreferences.contains("city" + i)) {
+                      editor.putString("city" + i, array[2]);
+                      editor.putString("state" + i, array[3]);
+                      editor.putString("street" + i, array[0]);
+                      editor.apply();
+                      break;
+                  }//end if
+
+              }//end else
+          }//end for
+            item.setIcon(android.R.drawable.btn_star_big_on);
             return true;
         }
-        return super.onOptionsItemSelected(item);
-    }
+        return super.onOptionsItemSelected(item);}
 
 }
